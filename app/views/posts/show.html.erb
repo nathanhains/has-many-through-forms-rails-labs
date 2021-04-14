@@ -1,1 +1,25 @@
+<%=@post.title%>
+<%=@post.content%>
+<%@post.categories.all.each do |category|%>
+<%= category.name%>
+<%end%>
+
+<%@post.comments.all.each do |comment|%>
+<h4><%=comment.user.username%> says: <%=comment.content%> </h4>
+<%end%>
+
+<%@post.comments.all.select('DISTINCT user_id').each do |comment|%>
+<%=link_to comment.user.username, user_path(comment.user)%>
+<%end%>
+
+<%=form_for(@comment = Comment.new) do |f|%>
+<%=f.label :comment_content%>
+<%=f.text_field :content%>
+<%= f.collection_select :user_id, User.all, :id, :username, :include_blank => true %>
+<%= f.fields_for :user, @comment.build_user do |user| %>
+    <%= user.text_field :username %>
+<% end %>
+<%= f.hidden_field :post_id, value: @post.id %> 
+<%=f.submit%>
+<%end%>
 
